@@ -1,0 +1,51 @@
+services:
+  mongo1:
+    image: mongo:6
+    container_name: mongo1
+    command: ["mongod", "--replSet", "rs0", "--bind_ip_all"]
+    ports:
+      - "27017:27017"
+
+  mongo2:
+    image: mongo:6
+    container_name: mongo2
+    command: ["mongod", "--replSet", "rs0", "--bind_ip_all"]
+    ports:
+      - "27018:27017"
+
+  mongo3:
+    image: mongo:6
+    container_name: mongo3
+    command: ["mongod", "--replSet", "rs0", "--bind_ip_all"]
+    ports:
+      - "27019:27017"
+
+  gateway:
+    build: ./gateway
+    container_name: gateway
+    ports:
+      - "3000:3000"
+    depends_on:
+      - auth-service
+    env_file:
+      - ./gateway/.env
+    volumes:
+      - ./gateway:/app
+      - /app/node_modules
+    command: npm run dev
+
+  auth-service:
+    build: ./services/auth-service
+    container_name: auth-service
+    ports:
+      - "3001:3001"
+    depends_on:
+      - mongo1
+      - mongo2
+      - mongo3
+    env_file:
+      - ./services/auth-service/.env
+    volumes:
+      - ./services/auth-service:/app
+      - /app/node_modules
+    command: npm run dev
