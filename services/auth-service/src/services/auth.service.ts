@@ -1,6 +1,8 @@
+import { toUserResponseDTO } from "../dto/user.mapper.js";
 import bcrypt from "bcrypt";
 import jwt from "jsonwebtoken";
 import { User } from "../models/user.model.js";
+
 
 export const registerUser = async (
     email: string,
@@ -8,28 +10,54 @@ export const registerUser = async (
     name: string,
     lastName: string
 ) => {
-    const hashed = await bcrypt.hash(password, 10);
+    const existingUser = await User.findOne({ email });
 
-    return User.create({
+    if (existingUser) {
+        throw new Error("User already exists");
+    }
+
+    const hashedPassword = await bcrypt.hash(password, 10);
+
+    const user = await User.create({
         email,
-        password: hashed,
+        password: hashedPassword,
         name,
-        lastName
+        lastName,
     });
+
+    return toUserResponseDTO(user);
 };
 
-export const loginUser = async (email: string, password: string) => {
+export const loginUser = async (
+    email: string,
+    password: string
+) => {
     const user = await User.findOne({ email });
-    if (!user) throw new Error("User not found");
 
-    const valid = await bcrypt.compare(password, user.password);
-    if (!valid) throw new Error("Invalid credentials");
+    if (!user) {
+        throw new Error("Invalid credentials");
+    }
+
+    const isMatch = await bcrypt.compare(password, user.password);
+
+    if (!isMatch) {
+        throw new Error("Invalid credentials");
+    }
 
     const token = jwt.sign(
-        { id: user._id },
-        process.env.JWT_SECRET!,
-        { expiresIn: "1d" }
+        {
+            id: user._id,
+            email: user.email,
+            role: user.role
+        },
+        process.env.JWT_SECRET as string,
+        {
+            expiresIn: "7d",
+        }
     );
 
-    return token;
+    return {
+        token,
+        user: toUserResponseDTO(user)
+    };
 };
