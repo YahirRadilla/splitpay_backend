@@ -5,7 +5,7 @@ export const createProxy = (target: string) =>
         target,
         changeOrigin: true,
         pathRewrite: {
-            "^/api/auth": "",
+            "^/api/": "",
         },
         on: {
             proxyReq: (proxyReq, req: any) => {
