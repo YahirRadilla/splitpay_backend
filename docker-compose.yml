@@ -65,3 +65,19 @@ services:
       - ./services/profile-service:/app
       - /app/node_modules
     command: npm run dev
+
+  expense-service:
+    build: ./services/expense-service
+    container_name: expense-service
+    ports:
+      - "3003:3003"
+    depends_on:
+      - mongo1
+      - mongo2
+      - mongo3
+    env_file:
+      - ./services/expense-service/.env
+    volumes:
+      - ./services/expense-service:/app
+      - /app/node_modules
+    command: npm run dev

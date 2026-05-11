@@ -15,4 +15,9 @@ router.use(
     createProxy(services.profile)
 );
 
+router.use(
+    "/expenses",
+    createProxy(services.expense)
+);
+
 export default router;
