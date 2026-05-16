@@ -4,6 +4,7 @@ import cors from "cors";
 
 import { connectDB } from "./config/db.js";
 import groupRoutes from "./routes/group.routes.js";
+import expenseRoutes from "./routes/expense.routes.js";
 
 dotenv.config();
 
@@ -14,6 +15,7 @@ app.use(cors());
 app.use(express.json());
 
 app.use("/", groupRoutes);
+app.use("/", expenseRoutes);
 
 const PORT = process.env.PORT || 3003;
 
