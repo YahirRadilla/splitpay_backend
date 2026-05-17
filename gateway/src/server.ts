@@ -1,7 +1,6 @@
 import express from "express";
-import cors from "cors";
 import dotenv from "dotenv";
-
+import cors from "cors";
 import routes from "./routes/index.js";
 
 
@@ -9,19 +8,19 @@ dotenv.config();
 
 const app = express();
 
-app.use(cors());
-app.use(express.json());
-
-
-app.get("/health", (_, res) => {
-  res.json({ status: "Gateway running" });
-});
-
+app.use(
+  cors({
+    origin: "http://localhost:5173",
+    credentials: true,
+  })
+);
 
 app.use("/api", routes);
 
-const PORT = process.env.PORT || 3000;
+app.get("/", (_, res) => {
+  res.send("OK");
+});
 
-app.listen(PORT, () => {
-  console.log(`Gateway running on port ${PORT}`);
+app.listen(3000, () => {
+  console.log("Server running");
 });

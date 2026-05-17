@@ -4,8 +4,8 @@ export const createProxy = (target: string) =>
     createProxyMiddleware({
         target,
         changeOrigin: true,
-        pathRewrite: {
-            "^/api/": "",
+        pathRewrite: (path, req) => {
+            return path.replace(/^\/api\/[^/]+/, "");
         },
         on: {
             proxyReq: (proxyReq, req: any) => {
