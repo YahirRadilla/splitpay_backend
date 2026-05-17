@@ -1,8 +1,16 @@
 import { Expense } from "../models/expense.model.js";
 
+import { validateGroupAccess } from "../utils/group-access.js";
+
 export const calculateBalances = async (
-    groupId: string
+    groupId: string,
+    userId: string
 ) => {
+    await validateGroupAccess(
+        groupId,
+        userId
+    );
+
     const expenses = await Expense.find({
         groupId,
     });

@@ -6,6 +6,7 @@ import { connectDB } from "./config/db.js";
 import groupRoutes from "./routes/group.routes.js";
 import expenseRoutes from "./routes/expense.routes.js";
 import balanceRoutes from "./routes/balance.routes.js";
+import settlementRoutes from "./routes/settlement.routes.js";
 
 dotenv.config();
 
@@ -18,6 +19,7 @@ app.use(express.json());
 app.use("/", groupRoutes);
 app.use("/", expenseRoutes);
 app.use("/", balanceRoutes);
+app.use("/", settlementRoutes);
 
 const PORT = process.env.PORT || 3003;
 
