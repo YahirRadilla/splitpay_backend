@@ -1,5 +1,7 @@
 import { Expense } from "../models/expense.model.js";
 
+import { Settlement } from "../models/settlement.model.js";
+
 import { validateGroupAccess } from "../utils/group-access.js";
 
 export const calculateBalances = async (
@@ -14,6 +16,11 @@ export const calculateBalances = async (
     const expenses = await Expense.find({
         groupId,
     });
+
+    const settlements =
+        await Settlement.find({
+            groupId,
+        });
 
     const balances: Record<string, number> = {};
 
@@ -33,6 +40,28 @@ export const calculateBalances = async (
 
             balances[split.userId]! -= split.amount;
         }
+    }
+
+    for (const settlement of settlements) {
+        if (
+            !balances[settlement.fromUserId]
+        ) {
+            balances[settlement.fromUserId] = 0;
+        }
+
+        if (
+            !balances[settlement.toUserId]
+        ) {
+            balances[settlement.toUserId] = 0;
+        }
+
+        balances[
+            settlement.fromUserId
+        ]! += settlement.amount;
+
+        balances[
+            settlement.toUserId
+        ]! -= settlement.amount;
     }
 
     return balances;

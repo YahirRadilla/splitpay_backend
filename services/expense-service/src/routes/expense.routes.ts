@@ -5,13 +5,17 @@ import {
     getAll,
 } from "../controllers/expense.controller.js";
 
+
 import { authMiddleware } from "../middlewares/auth.middleware.js";
+import { createExpenseSchema } from "../validators/expense.validator.js";
+import { validate } from "../middlewares/validate.middleware.js";
 
 const router = Router();
 
 router.post(
-    "/",
+    "/expense",
     authMiddleware,
+    validate(createExpenseSchema),
     create
 );
 

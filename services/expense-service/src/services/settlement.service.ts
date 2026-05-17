@@ -1,6 +1,67 @@
+import mongoose from "mongoose";
+
+import { Settlement } from "../models/settlement.model.js";
+
 import { calculateBalances } from "./balance.service.js";
 
 import { validateGroupAccess } from "../utils/group-access.js";
+
+export const createSettlement = async (
+    groupId: string,
+    fromUserId: string,
+    toUserId: string,
+    amount: number
+) => {
+    if (
+        !mongoose.Types.ObjectId.isValid(
+            toUserId
+        )
+    ) {
+        throw new Error("Invalid user id");
+    }
+
+    if (amount <= 0) {
+        throw new Error("Invalid amount");
+    }
+
+    const group = await validateGroupAccess(
+        groupId,
+        fromUserId
+    );
+
+    if (!group.members.includes(toUserId)) {
+        throw new Error(
+            "Receiver not in group"
+        );
+    }
+
+    const balances =
+        await calculateBalances(
+            groupId,
+            fromUserId
+        );
+
+    const currentDebt =
+        Math.abs(
+            balances[fromUserId] || 0
+        );
+
+    if (amount > currentDebt) {
+        throw new Error(
+            "Settlement exceeds debt"
+        );
+    }
+
+    const settlement =
+        await Settlement.create({
+            groupId,
+            fromUserId,
+            toUserId,
+            amount,
+        });
+
+    return settlement;
+};
 
 export const calculateSettlements = async (
     groupId: string,
@@ -75,3 +136,17 @@ export const calculateSettlements = async (
 
     return settlements;
 };
+
+export const getSettlementHistory =
+    async (groupId: string, userId: string) => {
+        await validateGroupAccess(
+            groupId,
+            userId
+        );
+
+        return Settlement.find({
+            groupId,
+        }).sort({
+            createdAt: -1,
+        });
+    };
