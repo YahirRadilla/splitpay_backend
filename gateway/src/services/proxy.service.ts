@@ -5,16 +5,39 @@ export const createProxy = (target: string) =>
         target,
         changeOrigin: true,
         pathRewrite: (path, req) => {
-            return path.replace(/^\/api\/[^/]+/, "");
+            return path.replace(
+                /^\/api\/[^/]+/,
+                ""
+            );
         },
         on: {
-            proxyReq: (proxyReq, req: any) => {
+            proxyReq: (
+                proxyReq,
+                req: any
+            ) => {
+                if (
+                    req.headers.authorization
+                ) {
+                    proxyReq.setHeader(
+                        "Authorization",
+                        req.headers.authorization
+                    );
+                }
                 if (req.body) {
-                    const bodyData = JSON.stringify(req.body);
+                    const bodyData =
+                        JSON.stringify(req.body);
 
-                    proxyReq.setHeader("Content-Type", "application/json");
-                    proxyReq.setHeader("Content-Length", Buffer.byteLength(bodyData));
+                    proxyReq.setHeader(
+                        "Content-Type",
+                        "application/json"
+                    );
 
+                    proxyReq.setHeader(
+                        "Content-Length",
+                        Buffer.byteLength(
+                            bodyData
+                        )
+                    );
                     proxyReq.write(bodyData);
                 }
             },
