@@ -61,3 +61,32 @@ export const loginUser = async (
         user: toUserResponseDTO(user)
     };
 };
+
+export const searchUsers = async (
+    query: string
+) => {
+    return User.find({
+        $or: [
+            {
+                name: {
+                    $regex: query,
+                    $options: "i",
+                },
+            },
+            {
+                lastName: {
+                    $regex: query,
+                    $options: "i",
+                },
+            },
+            {
+                email: {
+                    $regex: query,
+                    $options: "i",
+                },
+            },
+        ],
+    }).select(
+        "_id name lastName email"
+    );
+};

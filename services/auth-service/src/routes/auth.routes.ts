@@ -5,6 +5,7 @@ import {
     login,
     me,
     register,
+    search,
 } from "../controllers/auth.controller.js";
 
 import { authMiddleware } from "../middlewares/auth.middleware.js";
@@ -27,6 +28,12 @@ router.get(
     authMiddleware,
     authorize("admin"),
     admin
+);
+
+router.get(
+    "/users/search",
+    authMiddleware,
+    search
 );
 
 export default router;

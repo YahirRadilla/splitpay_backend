@@ -3,6 +3,7 @@ import type { Request, Response } from "express";
 import {
     loginUser,
     registerUser,
+    searchUsers,
 } from "../services/auth.service.js";
 
 export const register = async (
@@ -61,4 +62,23 @@ export const admin = async (
     res.status(200).json({
         message: "Admin route",
     });
+};
+
+export const search = async (
+    req: Request,
+    res: Response
+) => {
+    try {
+        const query =
+            req.query.q?.toString() || "";
+
+        const users =
+            await searchUsers(query);
+
+        res.status(200).json(users);
+    } catch (error: any) {
+        res.status(400).json({
+            error: error.message,
+        });
+    }
 };
