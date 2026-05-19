@@ -4,6 +4,7 @@ import {
     addMember,
     createGroup,
     getGroups,
+    getGroupById,
 } from "../services/group.service.js";
 
 export const create = async (
@@ -40,6 +41,24 @@ export const getAll = async (
         });
     }
 };
+
+export const getOne = async (
+    req: Request,
+    res: Response
+) => {
+    try {
+        const group =
+            await getGroupById(
+                req.params.id as string
+            )
+
+        res.status(200).json(group)
+    } catch (error: any) {
+        res.status(400).json({
+            error: error.message,
+        })
+    }
+}
 
 export const add = async (
     req: Request,

@@ -39,3 +39,18 @@ export const addMember = async (
 
     return group;
 };
+
+export const getGroupById = async (
+    groupId: string
+) => {
+    const group =
+        await Group.findById(groupId)
+
+    if (!group) {
+        throw new Error(
+            'Group not found'
+        )
+    }
+
+    return group
+}

@@ -4,6 +4,7 @@ import {
     add,
     create,
     getAll,
+    getOne,
 } from "../controllers/group.controller.js";
 
 import { authMiddleware } from "../middlewares/auth.middleware.js";
@@ -21,6 +22,12 @@ router.get(
     authMiddleware,
     getAll
 );
+
+router.get(
+    '/groups/:id',
+    authMiddleware,
+    getOne
+)
 
 router.post(
     "/groups/:id/members",
