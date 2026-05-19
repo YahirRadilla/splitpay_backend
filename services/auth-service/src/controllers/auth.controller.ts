@@ -3,6 +3,7 @@ import type { Request, Response } from "express";
 import {
     loginUser,
     registerUser,
+    getUserById,
 } from "../services/auth.service.js";
 
 export const register = async (
@@ -62,3 +63,21 @@ export const admin = async (
         message: "Admin route",
     });
 };
+
+export const getUser = async (
+    req: Request,
+    res: Response
+) => {
+    try {
+        const user =
+            await getUserById(
+                req.params.id as string
+            )
+
+        res.status(200).json(user)
+    } catch (error: any) {
+        res.status(400).json({
+            error: error.message,
+        })
+    }
+}

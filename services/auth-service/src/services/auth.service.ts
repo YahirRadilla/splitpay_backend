@@ -61,3 +61,18 @@ export const loginUser = async (
         user: toUserResponseDTO(user)
     };
 };
+
+export const getUserById = async (
+    id: string
+) => {
+    const user =
+        await User.findById(id)
+
+    if (!user) {
+        throw new Error(
+            'User not found'
+        )
+    }
+
+    return toUserResponseDTO(user)
+}

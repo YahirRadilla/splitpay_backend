@@ -5,6 +5,7 @@ import {
     login,
     me,
     register,
+    getUser,
 } from "../controllers/auth.controller.js";
 
 import { authMiddleware } from "../middlewares/auth.middleware.js";
@@ -28,5 +29,11 @@ router.get(
     authorize("admin"),
     admin
 );
+
+router.get(
+    '/users/:id',
+    authMiddleware,
+    getUser
+)
 
 export default router;
