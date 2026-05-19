@@ -2,6 +2,7 @@ import { Router } from "express";
 
 import {
     admin,
+    getUser,
     login,
     me,
     register,
@@ -29,6 +30,12 @@ router.get(
     authorize("admin"),
     admin
 );
+
+router.get(
+    '/users/:id',
+    authMiddleware,
+    getUser
+)
 
 router.get(
     "/users/search",
