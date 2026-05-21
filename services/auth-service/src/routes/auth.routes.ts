@@ -32,15 +32,15 @@ router.get(
 );
 
 router.get(
-    '/users/:id',
-    authMiddleware,
-    getUser
-)
-
-router.get(
     "/users/search",
     authMiddleware,
     search
 );
+
+router.get(
+    '/users/:id',
+    authMiddleware,
+    getUser
+)
 
 export default router;
