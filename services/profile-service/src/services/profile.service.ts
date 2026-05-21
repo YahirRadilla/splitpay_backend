@@ -32,15 +32,18 @@ export const updateProfile = async (
     userId: string,
     data: any
 ) => {
-    const profile = await Profile.findOneAndUpdate(
-        {
-            userId,
-        },
-        data,
-        {
-            new: true,
-        }
-    );
+    const profile =
+        await Profile.findOneAndUpdate(
+            {
+                userId,
+            },
+            data,
+            {
+                new: true,
+
+                upsert: true,
+            }
+        );
 
     return profile;
 };
