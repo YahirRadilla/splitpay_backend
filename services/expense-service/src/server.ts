@@ -8,6 +8,7 @@ import expenseRoutes from "./routes/expense.routes.js";
 import balanceRoutes from "./routes/balance.routes.js";
 import settlementRoutes from "./routes/settlement.routes.js";
 import invitationRoutes from "./routes/invitation.routes.js";
+import activityRoutes from "./routes/activity.routes.js";
 
 dotenv.config();
 
@@ -27,6 +28,7 @@ app.use("/", expenseRoutes);
 app.use("/", balanceRoutes);
 app.use("/", settlementRoutes);
 app.use("/", invitationRoutes);
+app.use("/", activityRoutes);
 
 const PORT = process.env.PORT || 3003;
 

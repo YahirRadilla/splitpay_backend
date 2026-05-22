@@ -1,6 +1,7 @@
 import { Invitation } from "../models/invitation.model.js";
 
 import { Group } from "../models/group.model.js";
+import { createActivity } from "./activity.service.js";
 
 export const createInvitation =
     async (
@@ -68,6 +69,16 @@ export const createInvitation =
                     24 *
                     7
                 ),
+        }).then(async () => {
+            await createActivity(
+                groupId,
+                invitedBy,
+                "invitation_sent",
+                "Invitation sent",
+                {
+                    invitedUserId,
+                }
+            );
         });
     };
 
@@ -147,6 +158,14 @@ export const acceptInvitation =
 
         await invitation.save();
 
+        await createActivity(
+            invitation.groupId,
+            userId,
+            "member_joined",
+            "Joined group",
+            {}
+        );
+
         return invitation;
     };
 
@@ -179,6 +198,14 @@ export const rejectInvitation =
             "rejected";
 
         await invitation.save();
+
+        await createActivity(
+            invitation.groupId,
+            userId,
+            "member_rejected",
+            "Rejected invitation",
+            {}
+        );
 
         return invitation;
     };

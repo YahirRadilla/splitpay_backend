@@ -1,5 +1,6 @@
 import { Expense } from "../models/expense.model.js";
 import { Group } from "../models/group.model.js";
+import { createActivity } from "./activity.service.js";
 
 export const createExpense = async (
     groupId: string,
@@ -34,6 +35,17 @@ export const createExpense = async (
         amount,
         splits,
     });
+
+    await createActivity(
+        groupId,
+        paidBy,
+        "expense_created",
+        `${description} created`,
+        {
+            expenseId: expense.id,
+            amount,
+        }
+    );
 
     return expense;
 };

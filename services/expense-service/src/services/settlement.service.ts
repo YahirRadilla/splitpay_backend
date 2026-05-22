@@ -5,6 +5,7 @@ import { Settlement } from "../models/settlement.model.js";
 import { calculateBalances } from "./balance.service.js";
 
 import { validateGroupAccess } from "../utils/group-access.js";
+import { createActivity } from "./activity.service.js";
 
 export const createSettlement = async (
     groupId: string,
@@ -83,6 +84,21 @@ export const createSettlement = async (
         });
 
         await session.commitTransaction();
+
+        await createActivity(
+            groupId,
+            fromUserId,
+            "settlement_created",
+            `Settlement of ${amount}`,
+            {
+                settlementId:
+                    settlement.id,
+
+                toUserId,
+
+                amount,
+            }
+        );
 
         return settlement;
     } catch (error) {
