@@ -1,6 +1,7 @@
 import { Expense } from "../models/expense.model.js";
 import { Group } from "../models/group.model.js";
 import { createActivity } from "./activity.service.js";
+import { createNotification } from "./notification.service.js";
 
 export const createExpense = async (
     groupId: string,
@@ -35,6 +36,27 @@ export const createExpense = async (
         amount,
         splits,
     });
+
+    for (const memberId of group.members) {
+        if (memberId === paidBy) {
+            continue;
+        }
+
+        await createNotification(
+            memberId,
+
+            "expense_created",
+
+            "New expense",
+
+            `${description} was added`,
+
+            {
+                groupId,
+                amount,
+            }
+        );
+    }
 
     await createActivity(
         groupId,

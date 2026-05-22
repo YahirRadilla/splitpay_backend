@@ -6,6 +6,7 @@ import { calculateBalances } from "./balance.service.js";
 
 import { validateGroupAccess } from "../utils/group-access.js";
 import { createActivity } from "./activity.service.js";
+import { createNotification } from "./notification.service.js";
 
 export const createSettlement = async (
     groupId: string,
@@ -84,6 +85,21 @@ export const createSettlement = async (
         });
 
         await session.commitTransaction();
+
+        await createNotification(
+            toUserId,
+
+            "settlement_received",
+
+            "Settlement received",
+
+            `${amount} settlement received`,
+
+            {
+                groupId,
+                amount,
+            }
+        );
 
         await createActivity(
             groupId,

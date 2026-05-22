@@ -2,6 +2,8 @@ import { Invitation } from "../models/invitation.model.js";
 
 import { Group } from "../models/group.model.js";
 import { createActivity } from "./activity.service.js";
+import { createNotification } from "./notification.service.js";
+
 
 export const createInvitation =
     async (
@@ -70,6 +72,19 @@ export const createInvitation =
                     7
                 ),
         }).then(async () => {
+            await createNotification(
+                invitedUserId,
+
+                "invitation_received",
+
+                "New invitation",
+
+                "You were invited to a group",
+
+                {
+                    groupId,
+                }
+            );
             await createActivity(
                 groupId,
                 invitedBy,

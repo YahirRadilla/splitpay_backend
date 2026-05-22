@@ -9,6 +9,7 @@ import balanceRoutes from "./routes/balance.routes.js";
 import settlementRoutes from "./routes/settlement.routes.js";
 import invitationRoutes from "./routes/invitation.routes.js";
 import activityRoutes from "./routes/activity.routes.js";
+import notificationRoutes from "./routes/notification.routes.js";
 
 dotenv.config();
 
@@ -29,6 +30,7 @@ app.use("/", balanceRoutes);
 app.use("/", settlementRoutes);
 app.use("/", invitationRoutes);
 app.use("/", activityRoutes);
+app.use("/", notificationRoutes);
 
 const PORT = process.env.PORT || 3003;
 
