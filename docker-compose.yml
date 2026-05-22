@@ -101,3 +101,18 @@ services:
       - ./services/expense-service:/app
       - /app/node_modules
     command: npm run dev
+
+  realtime-service:
+    build: ./realtime-service
+
+    container_name: realtime-service
+
+    ports:
+      - "5000:5000"
+
+    volumes:
+      - ./realtime-service:/app
+      - /app/node_modules
+
+    environment:
+      PORT: 5000
