@@ -2,7 +2,7 @@ import { toUserResponseDTO } from "../dto/user.mapper.js";
 import bcrypt from "bcrypt";
 import jwt from "jsonwebtoken";
 import { User } from "../models/user.model.js";
-
+import { createStripeCustomer } from "./billing.service.js";
 
 export const registerUser = async (
     email: string,
@@ -24,6 +24,11 @@ export const registerUser = async (
         name,
         lastName,
     });
+
+    await createStripeCustomer(
+        user.id,
+        user.email
+    );
 
     return toUserResponseDTO(user);
 };

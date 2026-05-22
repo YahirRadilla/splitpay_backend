@@ -14,8 +14,15 @@ const MONGO_URI =
 const userSchema = new mongoose.Schema(
     {
         email: String,
+
         password: String,
+
         role: String,
+
+        stripeCustomerId: String,
+
+        defaultPaymentMethodId:
+            String,
     },
     {
         timestamps: true,
@@ -138,6 +145,12 @@ const seed = async () => {
                         i === 0
                             ? "admin"
                             : "user",
+
+                    stripeCustomerId:
+                        `cus_${faker.string.alphanumeric(24)}`,
+
+                    defaultPaymentMethodId:
+                        `pm_${faker.string.alphanumeric(24)}`,
                 });
 
             users.push(user);
