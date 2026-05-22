@@ -20,6 +20,26 @@ services:
     ports:
       - "27019:27017"
 
+  seed:
+    build: .
+    container_name: splitpay-seed
+
+    working_dir: /app
+
+    command: npm run seed
+
+    env_file:
+      - .env
+
+    volumes:
+      - .:/app
+      - /app/node_modules
+
+    depends_on:
+      - mongo1
+      - mongo2
+      - mongo3
+
   gateway:
     build: ./gateway
     container_name: gateway
