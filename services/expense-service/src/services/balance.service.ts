@@ -1,3 +1,5 @@
+import mongoose from "mongoose";
+
 import { Expense } from "../models/expense.model.js";
 
 import { Settlement } from "../models/settlement.model.js";
@@ -6,23 +8,40 @@ import { validateGroupAccess } from "../utils/group-access.js";
 
 export const calculateBalances = async (
     groupId: string,
-    userId: string
+    userId: string,
+    session?: mongoose.ClientSession
 ) => {
     await validateGroupAccess(
         groupId,
-        userId
+        userId,
+        session
     );
 
-    const expenses = await Expense.find({
-        groupId,
-    });
 
-    const settlements =
-        await Settlement.find({
+    const expenses = session
+        ? await Expense.find(
+            { groupId },
+            null,
+            { session }
+        )
+        : await Expense.find({
             groupId,
         });
 
-    const balances: Record<string, number> = {};
+    const settlements = session
+        ? await Settlement.find(
+            { groupId },
+            null,
+            { session }
+        )
+        : await Settlement.find({
+            groupId,
+        });
+
+    const balances: Record<
+        string,
+        number
+    > = {};
 
     for (const expense of expenses) {
         const paidBy = expense.paidBy;
@@ -31,28 +50,43 @@ export const calculateBalances = async (
             balances[paidBy] = 0;
         }
 
-        balances[paidBy] += expense.amount;
+        balances[paidBy]! +=
+            expense.amount;
 
         for (const split of expense.splits) {
-            if (!balances[split.userId]) {
-                balances[split.userId] = 0;
+            if (
+                !balances[split.userId]
+            ) {
+                balances[
+                    split.userId
+                ] = 0;
             }
 
-            balances[split.userId]! -= split.amount;
+            balances[
+                split.userId
+            ]! -= split.amount;
         }
     }
 
     for (const settlement of settlements) {
         if (
-            !balances[settlement.fromUserId]
+            !balances[
+            settlement.fromUserId
+            ]
         ) {
-            balances[settlement.fromUserId] = 0;
+            balances[
+                settlement.fromUserId
+            ] = 0;
         }
 
         if (
-            !balances[settlement.toUserId]
+            !balances[
+            settlement.toUserId
+            ]
         ) {
-            balances[settlement.toUserId] = 0;
+            balances[
+                settlement.toUserId
+            ] = 0;
         }
 
         balances[

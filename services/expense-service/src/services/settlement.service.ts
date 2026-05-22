@@ -12,55 +12,86 @@ export const createSettlement = async (
     toUserId: string,
     amount: number
 ) => {
-    if (
-        !mongoose.Types.ObjectId.isValid(
-            toUserId
-        )
-    ) {
-        throw new Error("Invalid user id");
-    }
+    const session =
+        await mongoose.startSession();
 
-    if (amount <= 0) {
-        throw new Error("Invalid amount");
-    }
+    try {
+        session.startTransaction();
 
-    const group = await validateGroupAccess(
-        groupId,
-        fromUserId
-    );
+        if (
+            !mongoose.Types.ObjectId.isValid(
+                toUserId
+            )
+        ) {
+            throw new Error(
+                "Invalid user id"
+            );
+        }
 
-    if (!group.members.includes(toUserId)) {
-        throw new Error(
-            "Receiver not in group"
-        );
-    }
+        if (amount <= 0) {
+            throw new Error(
+                "Invalid amount"
+            );
+        }
 
-    const balances =
-        await calculateBalances(
-            groupId,
-            fromUserId
-        );
+        const group =
+            await validateGroupAccess(
+                groupId,
+                fromUserId
+            );
 
-    const currentDebt =
-        Math.abs(
-            balances[fromUserId] || 0
-        );
+        if (
+            !group.members.includes(
+                toUserId
+            )
+        ) {
+            throw new Error(
+                "Receiver not in group"
+            );
+        }
 
-    if (amount > currentDebt) {
-        throw new Error(
-            "Settlement exceeds debt"
-        );
-    }
+        const balances =
+            await calculateBalances(
+                groupId,
+                fromUserId,
+                session
+            );
 
-    const settlement =
-        await Settlement.create({
-            groupId,
-            fromUserId,
-            toUserId,
-            amount,
+        const currentDebt =
+            Math.abs(
+                balances[
+                fromUserId
+                ] || 0
+            );
+
+        if (amount > currentDebt) {
+            throw new Error(
+                "Settlement exceeds debt"
+            );
+        }
+
+        const settlement =
+            new Settlement({
+                groupId,
+                fromUserId,
+                toUserId,
+                amount,
+            });
+
+        await settlement.save({
+            session,
         });
 
-    return settlement;
+        await session.commitTransaction();
+
+        return settlement;
+    } catch (error) {
+        await session.abortTransaction();
+
+        throw error;
+    } finally {
+        session.endSession();
+    }
 };
 
 export const calculateSettlements = async (
