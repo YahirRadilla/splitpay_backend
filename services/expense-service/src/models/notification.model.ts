@@ -32,11 +32,20 @@ const notificationSchema =
                 type: Object,
                 default: {},
             },
+            deletedAt: {
+                type: Date,
+                default: null,
+            }
         },
         {
             timestamps: true,
         }
     );
+
+notificationSchema.index({
+    userId: 1,
+    updatedAt: 1,
+});
 
 export const Notification =
     mongoose.model(

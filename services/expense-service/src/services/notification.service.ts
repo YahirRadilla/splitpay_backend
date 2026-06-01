@@ -1,4 +1,5 @@
 import { Notification } from "../models/notification.model.js";
+import { emitRealtimeEvent } from "./realtime.service.js";
 
 export const createNotification =
     async (
@@ -14,6 +15,16 @@ export const createNotification =
             title,
             message,
             metadata,
+        }).then(async (notification) => {
+            await emitRealtimeEvent(
+                "/events/notification-created",
+                {
+                    userId,
+
+                    payload:
+                        notification,
+                }
+            );
         });
     };
 
