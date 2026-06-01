@@ -103,7 +103,7 @@ services:
     command: npm run dev
 
   realtime-service:
-    build: ./realtime-service
+    build: ./services/realtime-service
 
     container_name: realtime-service
 
@@ -111,8 +111,10 @@ services:
       - "5000:5000"
 
     volumes:
-      - ./realtime-service:/app
+      - ./services/realtime-service:/app
       - /app/node_modules
 
     environment:
       PORT: 5000
+
+    command: npm run dev
