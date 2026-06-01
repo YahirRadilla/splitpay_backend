@@ -7,13 +7,23 @@ import { calculateBalances } from "./balance.service.js";
 import { validateGroupAccess } from "../utils/group-access.js";
 import { createActivity } from "./activity.service.js";
 import { createNotification } from "./notification.service.js";
+import { emitRealtimeEvent } from "./realtime.service.js";
 
 export const createSettlement = async (
     groupId: string,
     fromUserId: string,
     toUserId: string,
-    amount: number
+    amount: number,
+    requestId: string
 ) => {
+    const existingExpense =
+        await Settlement.findOne({
+            requestId,
+        });
+
+    if (existingExpense) {
+        return existingExpense;
+    }
     const session =
         await mongoose.startSession();
 
@@ -52,7 +62,7 @@ export const createSettlement = async (
             );
         }
 
-        const balances =
+        let balances =
             await calculateBalances(
                 groupId,
                 fromUserId,
@@ -78,6 +88,7 @@ export const createSettlement = async (
                 fromUserId,
                 toUserId,
                 amount,
+                requestId,
             });
 
         await settlement.save({
@@ -85,6 +96,7 @@ export const createSettlement = async (
         });
 
         await session.commitTransaction();
+
 
         await createNotification(
             toUserId,
@@ -115,6 +127,34 @@ export const createSettlement = async (
                 amount,
             }
         );
+
+        balances =
+            await calculateBalances(
+                groupId,
+                fromUserId
+            );
+
+        await emitRealtimeEvent(
+            "/events/settlement-created",
+            {
+                groupId,
+
+                payload:
+                    settlement,
+            }
+        );
+
+
+        await emitRealtimeEvent(
+            "/events/balance-updated",
+            {
+                groupId,
+
+                payload: balances,
+            }
+        );
+
+
 
         return settlement;
     } catch (error) {

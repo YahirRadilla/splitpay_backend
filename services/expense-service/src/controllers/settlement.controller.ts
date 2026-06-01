@@ -16,7 +16,8 @@ export const create = async (
                 req.body.groupId,
                 req.user.id,
                 req.body.toUserId,
-                req.body.amount
+                req.body.amount,
+                req.body.requestId
             );
 
         res.status(201).json(settlement);
