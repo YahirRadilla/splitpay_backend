@@ -21,6 +21,10 @@ const userSchema = new mongoose.Schema({
     stripeCustomerId: {
         type: String,
     },
+    stripeConnectedAccountId: {
+        type: String,
+        default: null,
+    },
 
     defaultPaymentMethodId: {
         type: String,

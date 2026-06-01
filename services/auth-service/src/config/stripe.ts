@@ -1,8 +1,12 @@
 import Stripe from "stripe";
 
+console.log(
+    "STRIPE_SECRET_KEY exists:",
+    !!process.env.STRIPE_SECRET_KEY
+);
+
 const stripeSecretKey =
-    process.env
-        .STRIPE_SECRET_KEY;
+    process.env.STRIPE_SECRET_KEY;
 
 if (!stripeSecretKey) {
     throw new Error(
@@ -11,6 +15,4 @@ if (!stripeSecretKey) {
 }
 
 export const stripe =
-    new Stripe(
-        stripeSecretKey
-    );
+    new Stripe(stripeSecretKey);
