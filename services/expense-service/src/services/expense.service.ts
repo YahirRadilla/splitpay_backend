@@ -1,14 +1,28 @@
 import { Expense } from "../models/expense.model.js";
 import { Group } from "../models/group.model.js";
 import { createActivity } from "./activity.service.js";
+import { calculateBalances } from "./balance.service.js";
 import { createNotification } from "./notification.service.js";
+import { emitRealtimeEvent } from "./realtime.service.js";
 
 export const createExpense = async (
     groupId: string,
     paidBy: string,
     description: string,
-    amount: number
+    amount: number,
+    requestId: string
 ) => {
+    if (requestId) {
+        const existingExpense =
+            await Expense.findOne({
+                requestId,
+            });
+
+        if (existingExpense) {
+            return existingExpense;
+        }
+    }
+    console.log(requestId);
     const group = await Group.findById(groupId);
 
     if (!group) {
@@ -34,29 +48,33 @@ export const createExpense = async (
         paidBy,
         description,
         amount,
+        requestId,
         splits,
     });
 
-    for (const memberId of group.members) {
-        if (memberId === paidBy) {
-            continue;
-        }
+    await Promise.all(
+        group.members
+            .filter(
+                (memberId) =>
+                    memberId !== paidBy
+            )
+            .map((memberId) =>
+                createNotification(
+                    memberId,
 
-        await createNotification(
-            memberId,
+                    "expense_created",
 
-            "expense_created",
+                    "New expense",
 
-            "New expense",
+                    `${description} was added`,
 
-            `${description} was added`,
-
-            {
-                groupId,
-                amount,
-            }
-        );
-    }
+                    {
+                        groupId,
+                        amount,
+                    }
+                )
+            )
+    );
 
     await createActivity(
         groupId,
@@ -68,6 +86,33 @@ export const createExpense = async (
             amount,
         }
     );
+
+    const balances =
+        await calculateBalances(
+            groupId,
+            paidBy
+        );
+
+    await emitRealtimeEvent(
+        "/events/expense-created",
+        {
+            groupId,
+
+            payload: expense,
+        }
+    );
+
+    await emitRealtimeEvent(
+        "/events/balance-updated",
+        {
+            groupId,
+
+            payload: balances,
+        }
+    );
+
+
+
 
     return expense;
 };

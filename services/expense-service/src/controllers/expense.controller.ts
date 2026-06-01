@@ -10,11 +10,13 @@ export const create = async (
     res: Response
 ) => {
     try {
+        console.log(req.body);
         const expense = await createExpense(
             req.body.groupId,
             req.user.id,
             req.body.description,
-            req.body.amount
+            req.body.amount,
+            req.body.requestId
         );
 
         res.status(201).json(expense);

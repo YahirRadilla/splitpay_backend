@@ -10,4 +10,6 @@ export const createExpenseSchema =
             .max(100),
 
         amount: z.number().positive(),
+
+        requestId: z.string().min(1),
     });

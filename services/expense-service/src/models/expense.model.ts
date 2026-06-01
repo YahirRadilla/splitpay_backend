@@ -19,6 +19,11 @@ const splitSchema = new mongoose.Schema(
 
 const expenseSchema = new mongoose.Schema(
     {
+        requestId: {
+            type: String,
+            required: true,
+            unique: true,
+        },
         groupId: {
             type: String,
             required: true,
@@ -40,11 +45,21 @@ const expenseSchema = new mongoose.Schema(
         },
 
         splits: [splitSchema],
+        deletedAt: {
+            type: Date,
+            default: null,
+        }
     },
     {
         timestamps: true,
     }
 );
+
+
+expenseSchema.index({
+    groupId: 1,
+    updatedAt: 1,
+});
 
 export const Expense = mongoose.model(
     "Expense",
