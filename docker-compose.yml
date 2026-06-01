@@ -117,4 +117,8 @@ services:
     environment:
       PORT: 5000
 
+<<<<<<< HEAD
     command: npm run dev
+=======
+    command: npm run dev
+>>>>>>> 93f4c1e7c52a6e8648cc3727f85b71bc5732c9e8

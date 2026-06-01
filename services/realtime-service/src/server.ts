@@ -12,11 +12,15 @@ import { registerSockets } from "./sockets/socket.js";
 
 import { setSocketServer } from "./events/emitters.js";
 
+import eventRoutes from "./routes/event.routes.js";
+
 dotenv.config();
 
 const app = express();
 
 app.use(cors());
+
+app.use(express.json());
 
 app.get(
     "/health",
@@ -27,6 +31,12 @@ app.get(
         });
     }
 );
+
+app.get("/test", (_, res) => {
+    res.json({
+        ok: true,
+    });
+});
 
 const server =
     http.createServer(app);
@@ -42,6 +52,8 @@ const io =
 registerSockets(io);
 
 setSocketServer(io);
+
+app.use("/events", eventRoutes);
 
 const PORT =
     process.env.PORT || 5000;
