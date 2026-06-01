@@ -10,6 +10,8 @@ import settlementRoutes from "./routes/settlement.routes.js";
 import invitationRoutes from "./routes/invitation.routes.js";
 import activityRoutes from "./routes/activity.routes.js";
 import notificationRoutes from "./routes/notification.routes.js";
+import syncRoutes from "./routes/sync.routes.js";
+import internalRoutes from "./routes/internal.routes.js";
 
 dotenv.config();
 
@@ -31,6 +33,8 @@ app.use("/", settlementRoutes);
 app.use("/", invitationRoutes);
 app.use("/", activityRoutes);
 app.use("/", notificationRoutes);
+app.use("/", syncRoutes);
+app.use(internalRoutes);
 
 const PORT = process.env.PORT || 3003;
 
