@@ -11,12 +11,13 @@ import {
 
 import { authMiddleware } from "../middlewares/auth.middleware.js";
 import { authorize } from "../middlewares/role.middleware.js";
+import { authLimiter } from "../middlewares/rate-limit.js";
 
 const router = Router();
 
-router.post("/register", register);
+router.post("/register", authLimiter, register);
 
-router.post("/login", login);
+router.post("/login", authLimiter, login);
 
 router.get(
     "/me",
