@@ -27,11 +27,21 @@ const activitySchema =
                 type: Object,
                 default: {},
             },
+            deletedAt: {
+                type: Date,
+                default: null,
+            }
         },
         {
             timestamps: true,
-        }
+        },
+
     );
+
+activitySchema.index({
+    groupId: 1,
+    updatedAt: 1,
+});
 
 export const Activity =
     mongoose.model(

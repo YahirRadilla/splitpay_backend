@@ -1,6 +1,7 @@
 import { Activity } from "../models/activity.model.js";
 
 import { validateGroupAccess } from "../utils/group-access.js";
+import { emitRealtimeEvent } from "./realtime.service.js";
 
 export const createActivity =
     async (
@@ -16,6 +17,16 @@ export const createActivity =
             type,
             message,
             metadata,
+        }).then(async (activity) => {
+            await emitRealtimeEvent(
+                "/events/activity-created",
+                {
+                    groupId,
+
+                    payload:
+                        activity,
+                }
+            );
         });
     };
 
