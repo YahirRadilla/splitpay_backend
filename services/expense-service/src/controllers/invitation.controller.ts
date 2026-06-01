@@ -19,7 +19,9 @@ export const create =
 
                     req.user.id,
 
-                    req.body.invitedUserId
+                    req.body.invitedUserId,
+
+                    req.body.requestId
                 );
 
             res.status(201).json(

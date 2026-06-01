@@ -3,6 +3,11 @@ import mongoose from "mongoose";
 const invitationSchema =
     new mongoose.Schema(
         {
+            requestId: {
+                type: String,
+                required: true,
+                unique: true,
+            },
             groupId: {
                 type: String,
                 required: true,
@@ -36,11 +41,20 @@ const invitationSchema =
 
                 required: true,
             },
+            deletedAt: {
+                type: Date,
+                default: null,
+            }
         },
         {
             timestamps: true,
         }
     );
+
+invitationSchema.index({
+    invitedUserId: 1,
+    updatedAt: 1,
+});
 
 export const Invitation =
     mongoose.model(

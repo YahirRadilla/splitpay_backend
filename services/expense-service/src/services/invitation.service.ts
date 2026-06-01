@@ -3,14 +3,25 @@ import { Invitation } from "../models/invitation.model.js";
 import { Group } from "../models/group.model.js";
 import { createActivity } from "./activity.service.js";
 import { createNotification } from "./notification.service.js";
+import { emitRealtimeEvent } from "./realtime.service.js";
+
 
 
 export const createInvitation =
     async (
         groupId: string,
         invitedBy: string,
-        invitedUserId: string
+        invitedUserId: string,
+        requestId: string
     ) => {
+        const existingExpense =
+            await Invitation.findOne({
+                requestId,
+            });
+
+        if (existingExpense) {
+            return existingExpense;
+        }
         const group =
             await Group.findById(
                 groupId
@@ -71,7 +82,10 @@ export const createInvitation =
                     24 *
                     7
                 ),
-        }).then(async () => {
+
+            requestId,
+        }).then(async (invitation) => {
+
             await createNotification(
                 invitedUserId,
 
@@ -94,6 +108,19 @@ export const createInvitation =
                     invitedUserId,
                 }
             );
+
+            await emitRealtimeEvent(
+                "/events/member-invited",
+                {
+                    userId:
+                        invitedUserId,
+
+                    payload:
+                        invitation,
+                }
+            );
+
+
         });
     };
 
@@ -173,6 +200,19 @@ export const acceptInvitation =
 
         await invitation.save();
 
+
+        await emitRealtimeEvent(
+            "/events/member-joined",
+            {
+                groupId:
+                    invitation.groupId,
+
+                payload: {
+                    userId,
+                },
+            }
+        );
+
         await createActivity(
             invitation.groupId,
             userId,
@@ -180,6 +220,19 @@ export const acceptInvitation =
             "Joined group",
             {}
         );
+
+        await emitRealtimeEvent(
+            "/events/invitation-accepted",
+            {
+                groupId:
+                    invitation.groupId,
+
+                payload:
+                    invitation,
+            }
+        );
+
+
 
         return invitation;
     };
@@ -221,6 +274,19 @@ export const rejectInvitation =
             "Rejected invitation",
             {}
         );
+
+        await emitRealtimeEvent(
+            "/events/invitation-rejected",
+            {
+                groupId:
+                    invitation.groupId,
+
+                payload:
+                    invitation,
+            }
+        );
+
+
 
         return invitation;
     };
