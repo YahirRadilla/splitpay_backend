@@ -1,4 +1,5 @@
 import { Group } from "../models/group.model.js";
+import { emitRealtimeEvent } from "./realtime.service.js";
 
 export const createGroup = async (
     name: string,
@@ -9,6 +10,15 @@ export const createGroup = async (
         ownerId,
         members: [ownerId],
     });
+
+    await emitRealtimeEvent(
+        "/events/group-created",
+        {
+            userId: ownerId,
+
+            payload: group,
+        }
+    );
 
     return group;
 };

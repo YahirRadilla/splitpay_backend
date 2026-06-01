@@ -17,11 +17,23 @@ const groupSchema = new mongoose.Schema(
                 type: String,
             },
         ],
+        deletedAt: {
+            type: Date,
+            default: null,
+        }
     },
     {
         timestamps: true,
     }
 );
+
+groupSchema.index({
+    members: 1,
+});
+
+groupSchema.index({
+    updatedAt: 1,
+});
 
 export const Group = mongoose.model(
     "Group",
